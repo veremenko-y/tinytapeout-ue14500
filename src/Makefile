@@ -2,14 +2,14 @@
 # and: https://github.com/mattvenn/rgb_mixer/blob/main/Makefile
 
 PROJ = sevenseg_top
-SOURCES= sevenseg_top.v user_module_339898704941023827.v
+SOURCES= sevenseg_top.v user_module_341178296293130834.v
 PIN_DEF = pins.pcf
 DEVICE = lp8k
 PACKAGE = cm81
 
 all: $(PROJ).bin
 
-sim: $(PROJ)_tb.vcd
+sim: user_module_341178296293130834_tb.vcd
 
 %.json: $(SOURCES)
 	yosys -p 'synth_ice40 -top $(PROJ) -json $(PROJ).json' $(SOURCES)
