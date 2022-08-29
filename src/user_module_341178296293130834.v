@@ -16,10 +16,10 @@ module user_module_341178296293130834(
   assign DATAIN = io_in[6];
 
   /* Outputs */
-  wire FL0;
-  wire JMP;
-  wire RTN;
-  wire FLF;
+  reg FL0;
+  reg JMP;
+  reg RTN;
+  reg FLF;
   reg DATAOUT;
   reg WRT;
   reg RR;
@@ -57,71 +57,64 @@ module user_module_341178296293130834(
   `define I_SKZ   4'b1110
   `define I_NOPF  4'b1111
 
-  reg [3:0] IR;
-  assign FL0 = IR == `I_NOP0;
-  assign JMP = IR == `I_JMP;
-  assign RTN = IR == `I_RTN;
-  assign FLF = (IR == `I_NOPF) && !SKZ;
+  wire [3:0] IR;
+  assign IR = (!SKZ) ? IR_IN : `I_NOPF;
+  
   wire DATAIFEN;
   assign DATAIFEN = DATAIN & IEN;
 
+  always@(posedge RST)
+  begin
+    IEN <= 0;
+    OEN <= 0;
+    SKZ <= 0;
+    FL0 <= 0;
+    JMP <= 0;
+    RTN <= 0;
+    FLF <= 0;
+    RR <= 0;
+    C <= 0;
+    WRT <= 0;
+    PHASE <= 0;
+  end
+
   always@(posedge CLK)
   begin
-    if(RST)
+    if(!PHASE)
     begin
-      IEN <= 0;
-      OEN <= 0;
-      SKZ <= 0;
-      RR <= 0;
-      C <= 0;
+      PHASE <= 1;
+      FL0 <= 0;
+      JMP <= 0;
+      RTN <= 0;
+      FLF <= 0;
       WRT <= 0;
-      PHASE <= 0;
-    end
-    else
-    begin
-      if(!PHASE)
-      begin
-        PHASE <= 1;
-        IR <= IR_IN | (SKZ & IR_IN);
-        WRT <= 0;
-        DATAOUT <= 0;
-        case (IR)
-          `I_ONE:
-            begin
-              RR <= 1;
-              C <= 0;
-            end
-          `I_STO:
-            begin
-              if(OEN)
-              begin
-                DATAOUT = RR;
-              end
-            end
-          `I_STOC:
-            begin
-              if(OEN)
-              begin
-                DATAOUT = !RR;
-              end
-            end
-          `I_RTN:
-            begin
-              SKZ <= 1;
-            end
-          `I_SKZ:
-            begin
-              if(!RR)
-                SKZ <= 1;
-            end 
-        endcase
-      end else begin
+      DATAOUT <= 0;
+      case (IR)
+        `I_NOP0:
+          FL0 <= 1;
+        `I_ONE:
+          begin
+            RR <= 1;
+            C <= 0;
+          end
+        `I_STO:
+          if(OEN)
+            DATAOUT <= RR;
+        `I_STOC:
+          if(OEN)
+            DATAOUT <= !RR;
+        `I_JMP:
+          JMP <= 1;
+        `I_RTN:
+            RTN <= 1;
+        `I_NOPF:
+          if(!SKZ) FLF <= 1;
+      endcase
+    end else begin
       PHASE <= 0;
       case (IR)
         `I_LD:
-          begin
             RR <= DATAIFEN;
-          end
         `I_ADD:
           begin
             RR <= DATAIFEN ^ RR ^ C; 
@@ -133,41 +126,28 @@ module user_module_341178296293130834(
             C <= DATAIFEN & RR | C & RR | C & DATAIFEN;
           end
         `I_NAND:
-          begin
             RR <= !(RR & DATAIFEN);
-          end
         `I_OR:
-          begin
             RR <= RR | DATAIFEN;
-          end
         `I_XOR:
-          begin
             RR <= RR ^ DATAIFEN;
-          end
         `I_STO:
-          begin
-            if(OEN)
-            begin
-              WRT <= 1;
-            end
-          end
+          if(OEN)
+            WRT <= 1;
         `I_STOC:
-          begin
-            if(OEN)
-            begin
-              WRT <= 1;
-            end
-          end
+          if(OEN)
+            WRT <= 1;
         `I_IEN:
-          begin
-            IEN <= DATAIN;
-          end
+          IEN <= DATAIN;
         `I_OEN:
-          begin
-            OEN <= DATAIN;
-          end
+          OEN <= DATAIN;
+        `I_RTN:
+            SKZ <= 1;
+        `I_SKZ:
+          if(!RR) SKZ <= 1;          
+        `I_NOPF:
+          if(SKZ) SKZ <= 0;
       endcase 
     end
   end
-end
 endmodule
