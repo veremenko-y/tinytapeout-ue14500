@@ -64,42 +64,47 @@ module user_module_341178296293130834(
 
   always@(posedge RST)
   begin
-    IEN <= 0;
-    OEN <= 0;
-    SKZ <= 0;
-    FL0 <= 0;
-    JMP <= 0;
-    RTN <= 0;
-    FLF <= 0;
-    RR <= 0;
-    C <= 0;
-    WRT <= 0;
+
   end
 
   always@(posedge CLK)
   begin
-    FL0 <= 0;
-    JMP <= 0;
-    RTN <= 0;
-    FLF <= 0;
-    WRT <= 0;
-    DATAOUT <= 0;
-    case (IR)
-      `I_NOP0:
-        FL0 <= 1;
-      `I_STO:
-        if(OEN)
-          DATAOUT <= RR;
-      `I_STOC:
-        if(OEN)
-          DATAOUT <= !RR;
-      `I_JMP:
-        JMP <= 1;
-      `I_RTN:
-        RTN <= 1;
-      `I_NOPF:
-        if(!SKZ) FLF <= 1;
-    endcase
+    if(RST)
+    begin
+      IEN <= 0;
+      OEN <= 0;
+      SKZ <= 0;
+      FL0 <= 0;
+      JMP <= 0;
+      RTN <= 0;
+      FLF <= 0;
+      RR <= 0;
+      C <= 0;
+      WRT <= 0;
+    end else begin
+      FL0 <= 0;
+      JMP <= 0;
+      RTN <= 0;
+      FLF <= 0;
+      WRT <= 0;
+      DATAOUT <= 0;
+      case (IR)
+        `I_NOP0:
+          FL0 <= 1;
+        `I_STO:
+          if(OEN)
+            DATAOUT <= RR;
+        `I_STOC:
+          if(OEN)
+            DATAOUT <= !RR;
+        `I_JMP:
+          JMP <= 1;
+        `I_RTN:
+          RTN <= 1;
+        `I_NOPF:
+          if(!SKZ) FLF <= 1;
+      endcase
+    end
   end
 
   always@(negedge CLK)

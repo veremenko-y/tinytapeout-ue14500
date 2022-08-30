@@ -68,10 +68,13 @@ initial begin
 
 initial 
 begin
+  io_in[7] = 0;
   #20
 	io_in[1] = 1;
+  io_in[0] = 1;
 	#(CLK_HALF_PERIOD);
 	io_in[1] = 0;
+  io_in[0] = 0;
 	#(CLK_HALF_PERIOD);
 
   `OP0(`I_ONE);
