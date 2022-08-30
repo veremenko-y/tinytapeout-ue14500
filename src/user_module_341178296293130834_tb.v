@@ -35,10 +35,6 @@ parameter CLK_HALF_PERIOD = 5;
   io_in[0] = 1'b1; \
   #(CLK_HALF_PERIOD); \
   io_in[0] = 1'b0; \
-  #(CLK_HALF_PERIOD); \
-  io_in[0] = 1'b1; \
-  #(CLK_HALF_PERIOD); \
-  io_in[0] = 1'b0; \
   #(CLK_HALF_PERIOD);
 
 `define OP1(I, P) \
@@ -47,10 +43,6 @@ parameter CLK_HALF_PERIOD = 5;
   io_in[3] = (I >> 1) & 1'b1; \
   io_in[2] = (I >> 0) & 1'b1; \
   io_in[6] = P; \
-  io_in[0] = 1'b1; \
-  #(CLK_HALF_PERIOD); \
-  io_in[0] = 1'b0; \
-  #(CLK_HALF_PERIOD); \
   io_in[0] = 1'b1; \
   #(CLK_HALF_PERIOD); \
   io_in[0] = 1'b0; \
@@ -84,6 +76,7 @@ begin
 
   `OP0(`I_ONE);
   `OP0(`I_ONE);
+  `OP1(`I_LD, 0);
   `OP1(`I_OEN, 0);
   `OP1(`I_IEN, 0);
   `OP0(`I_STO);
@@ -120,11 +113,13 @@ begin
 
   `OP1(`I_ONE, 1); // set carry
   `OP1(`I_ADD, 1);
+  
   `OP1(`I_LD, 1);
   `OP1(`I_SUB, 1);
-
   `OP1(`I_LD, 1);
   `OP1(`I_SUB, 0);
+  `OP1(`I_LD, 0);
+  `OP1(`I_SUB, 1);
 
   `OP1(`I_ONE, 1);
   `OP1(`I_NAND, 1);
@@ -134,10 +129,14 @@ begin
   `OP1(`I_XOR, 1);
   `OP1(`I_XOR, 1);
   `OP1(`I_OR, 1);
+  `OP1(`I_OR, 1);
 
   `OP1(`I_LD, 0);
   `OP1(`I_OR, 0);
   
+  `OP1(`I_LD, 1);
+  `OP1(`I_IEN, 0);
+  `OP1(`I_IEN, 1);
 
 
   `OP0(`I_NOP0);
