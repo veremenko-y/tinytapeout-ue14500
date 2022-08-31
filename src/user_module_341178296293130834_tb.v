@@ -35,6 +35,10 @@ parameter CLK_HALF_PERIOD = 5;
   io_in[0] = 1'b1; \
   #(CLK_HALF_PERIOD); \
   io_in[0] = 1'b0; \
+  #(CLK_HALF_PERIOD); \
+  io_in[0] = 1'b1; \
+  #(CLK_HALF_PERIOD); \
+  io_in[0] = 1'b0; \
   #(CLK_HALF_PERIOD);
 
 `define OP1(I, P) \
@@ -46,8 +50,11 @@ parameter CLK_HALF_PERIOD = 5;
   io_in[0] = 1'b1; \
   #(CLK_HALF_PERIOD); \
   io_in[0] = 1'b0; \
+  #(CLK_HALF_PERIOD); \
+  io_in[0] = 1'b1; \
+  #(CLK_HALF_PERIOD); \
+  io_in[0] = 1'b0; \
   #(CLK_HALF_PERIOD);
-
 initial begin
   $dumpfile("user_module_341178296293130834_tb.vcd");
   $dumpvars(0, user_module_341178296293130834_tb);
@@ -73,9 +80,17 @@ begin
 	io_in[1] = 1;
   io_in[0] = 1;
 	#(CLK_HALF_PERIOD);
-	io_in[1] = 0;
   io_in[0] = 0;
 	#(CLK_HALF_PERIOD);
+  io_in[0] = 1;
+	#(CLK_HALF_PERIOD);
+  io_in[0] = 0;
+	#(CLK_HALF_PERIOD);
+  io_in[0] = 1;
+	#(CLK_HALF_PERIOD);
+  io_in[0] = 0;
+	#(CLK_HALF_PERIOD);
+	io_in[1] = 0;
 
   `OP0(`I_ONE);
   `OP0(`I_ONE);
@@ -113,6 +128,11 @@ begin
   `OP1(`I_ADD, 1);
   `OP1(`I_ADD, 1);
   `OP1(`I_ADD, 0);
+
+  `OP0(`I_ONE);
+  `OP1(`I_ADD, 1);
+  `OP1(`I_LD, 1);
+  `OP1(`I_ADD, 1);
 
   `OP1(`I_ONE, 1); // set carry
   `OP1(`I_ADD, 1);
