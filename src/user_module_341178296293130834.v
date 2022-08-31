@@ -20,7 +20,7 @@ module user_module_341178296293130834(
   reg RTN;
   reg FLF;
   reg DATAOUT;
-  reg WRT;
+  wire WRT;
   reg RR;
   reg C;
 
@@ -37,7 +37,7 @@ module user_module_341178296293130834(
   reg IEN;
   reg OEN;
   reg SKZ;
-  reg PHASE;
+  reg WRTR;
   reg [3:0] IR;
   wire DATAIFEN;
   wire [3:0] IR_GATED;
@@ -64,28 +64,20 @@ module user_module_341178296293130834(
   assign DATAIFEN = DATAIN & IEN;
   // because assigning to IR register doesn't seem to take hold immediately
   assign IR_GATED = (!SKZ) ? IR_IN : `I_NOPF;
+  assign WRT = WRTR & !CLK;
 
   always@(posedge CLK) begin
     if(RST) begin
-      IEN <= 0;
-      OEN <= 0;
-      SKZ <= 0;
       FL0 <= 0;
       JMP <= 0;
       RTN <= 0;
       FLF <= 0;
-      RR <= 0;
-      C <= 0;
-      WRT <= 0;
-      PHASE <= 0;
       IR <= 'b0000;
-    end else if(PHASE == 0) begin
-      PHASE <= 1;
+    end else begin
       FL0 <= 0;
       JMP <= 0;
       RTN <= 0;
       FLF <= 0;
-      WRT <= 0;
       DATAOUT <= 0;
       IR <= IR_GATED; 
       case (IR_GATED)
@@ -104,8 +96,19 @@ module user_module_341178296293130834(
         `I_NOPF:
           if(!SKZ) FLF <= 1;
       endcase
+    end
+  end
+
+  always@(negedge CLK) begin
+    if(RST) begin
+      IEN <= 0;
+      OEN <= 0;
+      SKZ <= 0;
+      RR <= 0;
+      C <= 0;
+      WRTR <= 0;
     end else begin
-      PHASE <= 0;
+      WRTR <= 0;
       case (IR)
         `I_LD:
             RR <= DATAIFEN;
@@ -132,10 +135,10 @@ module user_module_341178296293130834(
             RR <= RR ^ DATAIFEN;
         `I_STO:
           if(OEN)
-            WRT <= 1;
+            WRTR <= 1;
         `I_STOC:
           if(OEN)
-            WRT <= 1;
+            WRTR <= 1;
         `I_IEN:
           IEN <= DATAIN;
         `I_OEN:
@@ -146,7 +149,7 @@ module user_module_341178296293130834(
           if(!RR) SKZ <= 1;          
         `I_NOPF:
           if(SKZ) SKZ <= 0;
-      endcase       
+      endcase
     end
   end
 endmodule
