@@ -72,6 +72,7 @@ module user_module_341178296293130834(
       JMP <= 0;
       RTN <= 0;
       FLF <= 0;
+      DATAOUT <= 0;
       IR <= 'b0000;
     end else begin
       FL0 <= 0;
@@ -134,11 +135,9 @@ module user_module_341178296293130834(
         `I_XOR:
             RR <= RR ^ DATAIFEN;
         `I_STO:
-          if(OEN)
-            WRTR <= 1;
+          if(OEN) WRTR <= 1;
         `I_STOC:
-          if(OEN)
-            WRTR <= 1;
+          if(OEN) WRTR <= 1;
         `I_IEN:
           IEN <= DATAIN;
         `I_OEN:
