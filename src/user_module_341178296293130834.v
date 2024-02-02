@@ -143,7 +143,7 @@ module user_module_341178296293130834(
         `I_OEN:
           OEN <= DATAIN;
         `I_RTN:
-            SKZ <= 1;
+          SKZ <= 1;
         `I_SKZ:
           if(!RR) SKZ <= 1;          
         `I_NOPF:
